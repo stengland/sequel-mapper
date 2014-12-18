@@ -78,13 +78,3 @@ module SimpleMapper
   end
 
 end
-
-def SimpleMapper( connection_uri: nil,
-                  database: Sequel.connect(connection_uri),
-                  **mappers
-                )
-  mappers.reduce({ database: database }) do |container, (key, mapper)|
-    container[key] = mapper.new(database[key], container: container)
-    container
-  end
-end

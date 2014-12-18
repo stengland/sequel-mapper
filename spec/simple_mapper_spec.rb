@@ -32,36 +32,6 @@ describe SimpleMapper do
     end
   end
 
-  describe '()' do
-    before do
-      db[:things].insert title: 'A record'
-    end
-    it 'sets up a hash containing repos' do
-      container = SimpleMapper(
-        database: db,
-        things: Things,
-        stuff: Stuff
-      )
-      expect(container[:things]).to be_a Things
-      expect(container[:stuff]).to be_a Stuff
-      expect(container[:things][1].title).to eq 'A record'
-    end
-
-    it "adds the db at key :database" do
-      container = SimpleMapper(
-        database: db
-      )
-      expect(container[:database]).to be db
-    end
-
-    it "allows set up with a connection uri" do
-      container = SimpleMapper(
-        connection_uri: 'sqlite:memory:test'
-      )
-      expect(container[:database]).to be_a Sequel::Database
-    end
-  end
-
   subject { Things.new db[:things] }
   let(:thing) { OpenStruct.new title: 'Test', description: 'A thingy' }
 
