@@ -3,7 +3,7 @@ require 'sequel'
 require 'ostruct'
 
 module SimpleMapper
-  def initialize(dataset, container: nil)
+  def initialize(dataset, container = nil)
     @dataset = dataset.clone
     @container = container
     @dataset.row_proc = method(:data_to_object)
