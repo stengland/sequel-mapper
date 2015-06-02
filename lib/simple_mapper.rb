@@ -1,16 +1,20 @@
 require "simple_mapper/version"
-require 'sequel'
-require 'ostruct'
+require "simple_mapper/struct"
+require 'sequel/core'
 
 module SimpleMapper
   def initialize(dataset, container = nil)
     @dataset = dataset.clone
     @container = container
     @dataset.row_proc = method(:data_to_object)
+    @model_klass = self.class.model_klass ||
+      SimpleMapper::Struct.new(*dataset.columns)
+    @primary_key = self.class.primary_key || :id
   end
 
   def create(object)
-    dataset.insert object_to_data(object)
+    id = dataset.insert create_data(object)
+    object.send("#{primary_key}=", id) unless object.public_send(primary_key)
   end
 
   def find(key)
@@ -34,15 +38,23 @@ module SimpleMapper
     end
   end
 
+  def count
+    dataset.count
+  end
+
   private
 
-  attr_reader :dataset, :container
+  attr_reader :dataset, :container, :model_klass, :primary_key
 
   def object_to_data(object)
     dataset.columns.reduce({}) do |hash, column|
-      hash[column] = object.public_send(column)
+      hash[column] = object.public_send(column) if object.respond_to?(column)
       hash
     end
+  end
+
+  def create_data(object)
+    object_to_data(object).delete_if { |k, v| v.to_s.strip == '' }
   end
 
   def data_to_object(data)
@@ -51,14 +63,6 @@ module SimpleMapper
 
   def find_object(object=nil, key: object.public_send(primary_key))
     dataset.where(primary_key => key) if key
-  end
-
-  def model_klass
-    self.class.model_klass || OpenStruct
-  end
-
-  def primary_key
-    self.class.primary_key || :id
   end
 
   module ClassMethods

@@ -1,4 +1,5 @@
 require 'simple_mapper'
+require 'ostruct'
 
 describe SimpleMapper do
   class Things
@@ -10,7 +11,7 @@ describe SimpleMapper do
     key :url
   end
 
-  class MyThing < OpenStruct; end
+  MyThing = SimpleMapper::Struct.new(:id, :title, :description)
 
   class MyThings
     include SimpleMapper
@@ -40,6 +41,18 @@ describe SimpleMapper do
       subject.create(thing)
       expect(db[:things].count).to eq 1
       expect(db[:things].first[:title]).to eq 'Test'
+    end
+
+    it 'sets the primary key on the object' do
+      subject.create(thing)
+      expect(thing.id).to eq 1
+    end
+
+    it 'removes primary key from data if it is nil' do
+      dataset = subject.send(:dataset)
+      expect(dataset).to receive(:insert)
+        .with({title: 'Test', description: 'A thingy'})
+      subject.create(thing)
     end
   end
 
@@ -91,6 +104,7 @@ describe SimpleMapper do
 
   describe '.model' do
     subject { MyThings.new db[:things] }
+    let(:thing) { MyThing.new title: 'Test', description: 'A thingy' }
 
     it 'sets the the class of the PORO returned by mapper' do
       subject.create(thing)
@@ -101,7 +115,9 @@ describe SimpleMapper do
   describe '.key' do
     subject { Stuff.new db[:stuff] }
     it 'sets the name of the primary key' do
-      subject.create(OpenStruct.new(url: 'http://google.com', title: 'Google'))
+      url_thing = OpenStruct.new(url: 'http://google.com', title: 'Google')
+      subject.create(url_thing)
+      expect(url_thing.url).to eq 'http://google.com'
       expect(subject.find('http://google.com').title).to eq 'Google'
     end
 
