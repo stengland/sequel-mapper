@@ -3,14 +3,16 @@ require "simple_mapper/struct"
 require 'sequel/core'
 
 module SimpleMapper
-  def initialize(dataset, container = nil)
+  def initialize(dataset)
+    @db = dataset.db
     @dataset = dataset.clone
-    @container = container
     @dataset.row_proc = method(:data_to_object)
     @model_klass = self.class.model_klass ||
       SimpleMapper::Struct.new(*dataset.columns)
     @primary_key = self.class.primary_key || :id
   end
+
+  attr_reader :dataset
 
   def create(object)
     id = dataset.insert create_data(object)
@@ -44,7 +46,7 @@ module SimpleMapper
 
   private
 
-  attr_reader :dataset, :container, :model_klass, :primary_key
+  attr_reader :db, :container, :model_klass, :primary_key
 
   def object_to_data(object)
     dataset.columns.reduce({}) do |hash, column|
