@@ -44,6 +44,16 @@ module SimpleMapper
     dataset.count
   end
 
+  %w{where order grep}.each do |sc|
+    define_method sc do |*args|
+      scope dataset.public_send(sc, *args)
+    end
+  end
+
+  def graph(*args)
+    scope dataset.extension(:graph_each).graph(*args)
+  end
+
   private
 
   attr_reader :db, :container, :model_klass, :primary_key
@@ -65,6 +75,10 @@ module SimpleMapper
 
   def find_object(object=nil, key: object.public_send(primary_key))
     dataset.where(primary_key => key) if key
+  end
+
+  def scope(dataset)
+    self.class.new(dataset)
   end
 
   module ClassMethods

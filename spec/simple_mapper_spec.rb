@@ -100,6 +100,14 @@ describe SimpleMapper do
         expect(new_found_thing.title).to eq 'New thing'
       end
     end
+
+    describe '#where' do
+      it 'returns a new instance of mapper with dataset scoped with where' do
+        new_mapper = subject.where(id: 1)
+        expect(new_mapper.class).to be subject.class
+        expect(new_mapper.dataset.sql).to match /WHERE \(`id` = 1\)/
+      end
+    end
   end
 
   describe '.model' do
