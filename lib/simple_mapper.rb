@@ -1,8 +1,11 @@
 require "simple_mapper/version"
 require "simple_mapper/struct"
 require 'sequel/core'
+require 'forwardable'
 
 module SimpleMapper
+  extend Forwardable
+
   def initialize(dataset)
     @db = dataset.db
     @dataset = dataset.clone
@@ -40,11 +43,9 @@ module SimpleMapper
     end
   end
 
-  def count
-    dataset.count
-  end
+  def_delegators :dataset, :count, :all, :each
 
-  %w{where order grep}.each do |sc|
+  %w{where order grep limit}.each do |sc|
     define_method sc do |*args|
       scope dataset.public_send(sc, *args)
     end
@@ -56,7 +57,7 @@ module SimpleMapper
 
   private
 
-  attr_reader :db, :container, :model_klass, :primary_key
+  attr_reader :db, :model_klass, :primary_key
 
   def object_to_data(object)
     dataset.columns.reduce({}) do |hash, column|
