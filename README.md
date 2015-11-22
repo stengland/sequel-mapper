@@ -1,6 +1,8 @@
 # SimpleMapper
 
-A super simple ORM built on top of Sequel.
+A super simple [datamapper](http://martinfowler.com/eaaCatalog/dataMapper.html)
+built on top of Sequel. For creating
+[repository](http://martinfowler.com/eaaCatalog/repository.html) like objects.
 
 ## Installation
 
@@ -18,13 +20,40 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
-
 ```ruby
 require 'simple_mapper'
 
+class Account
+  def initialize(attrs={})
+    #some way to covert attrs to @attibutes
+  end
+end
 
+class Accounts
+  include SimpleMapper
+  dataset :accounts
+end
+
+DB = Sequel.connect
+
+accounts = Accounts.new(DB)
+
+accounts.all #=> all accounts
+
+# CRUD
+
+account = Account.new(email: 'dave@example.com')
+
+accounts.create(account)
+
+accounts.find(1)
+
+accounts.update(account)
+
+accounts.delete(account)
 ```
+
+TODO: Improve usage instructions :)
 
 ## Contributing
 
