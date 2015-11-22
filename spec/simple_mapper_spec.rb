@@ -18,6 +18,12 @@ describe SimpleMapper do
     model MyThing
   end
 
+  class MyDataThings
+    include SimpleMapper
+    dataset :things
+    model MyThing
+  end
+
   let(:db) { Sequel.connect 'sqlite:memory:smtest' }
 
   before do
@@ -120,7 +126,17 @@ describe SimpleMapper do
     end
   end
 
-  describe '.key' do
+  describe '.dataset' do
+    subject { MyDataThings.new db }
+    let(:thing) { MyThing.new title: 'Test', description: 'A thingy' }
+
+    it 'sets the dataset to be used if only db is provided' do
+      subject.create(thing)
+      expect(subject.count).to eq 1
+    end
+  end
+
+  describe '.primary_key' do
     subject { Stuff.new db[:stuff] }
     it 'sets the name of the primary key' do
       url_thing = OpenStruct.new(url: 'http://google.com', title: 'Google')

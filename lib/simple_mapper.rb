@@ -6,13 +6,20 @@ require 'forwardable'
 module SimpleMapper
   extend Forwardable
 
-  def initialize(dataset)
-    @db = dataset.db
-    @dataset = dataset.clone
+  def initialize(options)
+    if options.is_a? Sequel::Dataset
+      @db = options.db
+      @dataset = options.clone
+    elsif options.is_a? Sequel::Database
+      @db = options
+      raise ArgumentError 'no dataset defined' if self.class._dataset.nil?
+      @dataset = db[self.class._dataset]
+    else
+      raise ArgumentError 'no database or dataset'
+    end
     @dataset.row_proc = method(:data_to_object)
-    @model_klass = self.class.model_klass ||
-      SimpleMapper::Struct.new(*dataset.columns)
-    @primary_key = self.class.primary_key || :id
+    @model = self.class._model || SimpleMapper::Struct.new(*dataset.columns)
+    @primary_key = self.class._primary_key || :id
   end
 
   attr_reader :dataset
@@ -57,7 +64,7 @@ module SimpleMapper
 
   private
 
-  attr_reader :db, :model_klass, :primary_key
+  attr_reader :db, :model, :primary_key
 
   def object_to_data(object)
     dataset.columns.reduce({}) do |hash, column|
@@ -71,7 +78,7 @@ module SimpleMapper
   end
 
   def data_to_object(data)
-    model_klass.new data
+    model.new data
   end
 
   def find_object(object=nil, key: object.public_send(primary_key))
@@ -83,15 +90,20 @@ module SimpleMapper
   end
 
   module ClassMethods
-    def model(model_klass)
-      @model_klass = model_klass
+    def model(model)
+      @_model = model
     end
 
-    def key(primary_key)
-      @primary_key = primary_key
+    def primary_key(primary_key)
+      @_primary_key = primary_key
+    end
+    alias :key :primary_key
+
+    def dataset(dataset)
+      @_dataset = dataset
     end
 
-    attr_reader :model_klass, :primary_key
+    attr_reader :_model, :_primary_key, :_dataset
   end
 
   def self.included(receiver)
