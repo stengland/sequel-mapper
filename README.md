@@ -1,4 +1,4 @@
-# SimpleMapper
+# Sequel::Mapper
 
 A super simple [datamapper](http://martinfowler.com/eaaCatalog/dataMapper.html)
 built on top of Sequel. For creating
@@ -8,7 +8,7 @@ built on top of Sequel. For creating
 
 Add this line to your application's Gemfile:
 
-    gem 'simple_mapper'
+    gem 'sequel-mapper'
 
 And then execute:
 
@@ -16,12 +16,12 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install simple_mapper
+    $ gem install sequel-mapper
 
 ## Usage
 
 ```ruby
-require 'simple_mapper'
+require 'sequel/mapper'
 
 class Account
   def initialize(attrs={})
@@ -30,7 +30,7 @@ class Account
 end
 
 class Accounts
-  include SimpleMapper
+  include Sequel::Mapper
   dataset :accounts
 end
 
@@ -57,7 +57,7 @@ TODO: Improve usage instructions :)
 
 ## Contributing
 
-1. Fork it ( https://github.com/stengland/simple_mapper/fork )
+1. Fork it ( https://github.com/stengland/sequel-mapper/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

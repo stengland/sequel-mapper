@@ -1,25 +1,25 @@
-require 'simple_mapper'
+require 'sequel/mapper'
 require 'ostruct'
 
-describe SimpleMapper do
+describe Sequel::Mapper do
   class Things
-    include SimpleMapper
+    include Sequel::Mapper
   end
 
   class Stuff
-    include SimpleMapper
+    include Sequel::Mapper
     key :url
   end
 
-  MyThing = SimpleMapper::Struct.new(:id, :title, :description)
+  MyThing = Sequel::Mapper::Struct.new(:id, :title, :description)
 
   class MyThings
-    include SimpleMapper
+    include Sequel::Mapper
     model MyThing
   end
 
   class MyDataThings
-    include SimpleMapper
+    include Sequel::Mapper
     dataset :things
     model MyThing
   end
