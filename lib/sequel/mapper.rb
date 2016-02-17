@@ -83,7 +83,11 @@ module Sequel
     end
 
     def find_object(object=nil, key: object.public_send(primary_key))
-      dataset.where(primary_key => key) if key
+      dataset.where(pk_with_table => key) if key
+    end
+
+    def pk_with_table
+      "#{dataset.first_source_table}__#{primary_key}".to_sym
     end
 
     def scope(dataset)
