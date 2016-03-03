@@ -51,7 +51,8 @@ module Sequel
       end
     end
 
-    def_delegators :dataset, :count, :all, :each
+    def_delegators :dataset, :count, :all, :each, :map, :first, :last
+    alias :size :count
 
     %w{where order grep limit}.each do |sc|
       define_method sc do |*args|
