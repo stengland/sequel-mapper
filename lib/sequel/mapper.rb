@@ -64,6 +64,10 @@ module Sequel
       scope dataset.extension(:graph_each).graph(*args)
     end
 
+    def with(mapper_class, join, options = {})
+      graph(dataset_for_mapper_class(mapper_class), join, options)
+    end
+
     private
 
     attr_reader :db, :model, :primary_key
@@ -93,6 +97,10 @@ module Sequel
 
     def scope(dataset)
       self.class.new(dataset)
+    end
+
+    def dataset_for_mapper_class(mapper_class)
+      mapper_class.new(db).dataset
     end
 
     module ClassMethods

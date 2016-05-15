@@ -8,6 +8,7 @@ describe Sequel::Mapper do
 
   class Stuff
     include Sequel::Mapper
+    dataset :stuff
     key :url
   end
 
@@ -36,6 +37,7 @@ describe Sequel::Mapper do
       String :url, primary_key: true
       String :title
       String :description
+      Integer :thing_id
     end
   end
 
@@ -112,6 +114,13 @@ describe Sequel::Mapper do
         new_mapper = subject.where(id: 1)
         expect(new_mapper.class).to be subject.class
         expect(new_mapper.dataset.sql).to match /WHERE \(`id` = 1\)/
+      end
+    end
+
+    describe '#with' do
+      it 'sets up a join using dataset from specified mapper class' do
+        expect(subject.with(Stuff, thing_id: :id).dataset.sql)
+          .to include("LEFT OUTER JOIN `stuff` ON (`stuff`.`thing_id` = `things`.`id`)")
       end
     end
   end
