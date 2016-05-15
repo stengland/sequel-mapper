@@ -26,7 +26,7 @@ module Sequel
     attr_reader :dataset
 
     def create(object)
-      id = dataset.insert create_data(object)
+      id = dataset.insert object_to_data(object)
       object.send("#{primary_key}=", id) unless object.public_send(primary_key)
     end
 
@@ -73,14 +73,12 @@ module Sequel
     attr_reader :db, :model, :primary_key
 
     def object_to_data(object)
-      dataset.columns.reduce({}) do |hash, column|
-        hash[column] = object.public_send(column) if object.respond_to?(column)
-        hash
+      dataset.columns.each_with_object({}) do |column, data|
+        if object.respond_to?(column)
+          value = object.public_send(column)
+          data[column] = value unless value.nil?
+        end
       end
-    end
-
-    def create_data(object)
-      object_to_data(object).delete_if { |k, v| v.to_s.strip == '' }
     end
 
     def data_to_object(data)
