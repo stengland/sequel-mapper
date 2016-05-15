@@ -43,7 +43,7 @@ module Sequel
       find_object(object).delete
     end
 
-    def perist(object)
+    def persist(object)
       if find_object(object).nil?
         create(object)
       else

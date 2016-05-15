@@ -93,7 +93,7 @@ describe Sequel::Mapper do
       it 'updates the record if it exists' do
         thing.id = 1
         thing.title = 'Thing'
-        subject.perist(thing)
+        subject.persist(thing)
         new_found_thing = subject[1]
         expect(new_found_thing.title).to eq 'Thing'
       end
@@ -101,7 +101,7 @@ describe Sequel::Mapper do
       it 'creates a record if it does not exist' do
         new_thing = OpenStruct.new title: 'New thing', description: 'Some thing'
 
-        subject.perist(new_thing)
+        subject.persist(new_thing)
         new_found_thing = subject[2]
         expect(new_found_thing.title).to eq 'New thing'
       end
