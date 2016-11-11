@@ -13,10 +13,10 @@ module Sequel
         @dataset = options.clone
       elsif options.is_a? Sequel::Database
         @db = options
-        raise ArgumentError 'no dataset defined' if self.class._dataset.nil?
+        raise ArgumentError, 'no dataset defined' if self.class._dataset.nil?
         @dataset = db[self.class._dataset]
       else
-        raise ArgumentError 'no database or dataset'
+        raise ArgumentError, 'no database or dataset'
       end
       @dataset.row_proc = method(:data_to_object)
       @model = self.class._model || Sequel::Mapper::Struct.new(*dataset.columns)
