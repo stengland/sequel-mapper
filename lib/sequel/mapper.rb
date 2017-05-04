@@ -10,15 +10,15 @@ module Sequel
     def initialize(options)
       if options.is_a? Sequel::Dataset
         @db = options.db
-        @dataset = options.clone
+        ds = options
       elsif options.is_a? Sequel::Database
         @db = options
         raise ArgumentError, 'no dataset defined' if self.class._dataset.nil?
-        @dataset = db[self.class._dataset]
+        ds = db[self.class._dataset]
       else
         raise ArgumentError, 'no database or dataset'
       end
-      @dataset.row_proc = method(:data_to_object)
+      @dataset = ds.with_row_proc method(:data_to_object)
       @model = self.class._model || Sequel::Mapper::Struct.new(*dataset.columns)
       @primary_key = self.class._primary_key || :id
     end
