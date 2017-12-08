@@ -54,7 +54,11 @@ module Sequel
     def_delegators :dataset, :count, :all, :each, :map, :first, :last, :empty?
     alias :size :count
 
-    %w{where order grep limit}.each do |sc|
+    define_method :where do |*args, &block|
+      scope dataset.public_send(:where, *args, &block)
+    end
+
+    %w{order grep limit}.each do |sc|
       define_method sc do |*args|
         scope dataset.public_send(sc, *args)
       end
